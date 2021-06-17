@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cows vs UFO</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;800&display=swap" rel="stylesheet">
+    <link href="front.css" rel="stylesheet">
+    <style>
+        #scores {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        strong {
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .table {
+            width: 400px;
+            padding: 5px;
+            margin-top: 20px;
+            background-color: #266569;
+        }
+
+        .table th {
+            text-align: center;
+        }
+
+        .table tr td:nth-child(1) {
+            text-align: right;
+            padding-right: 5px;
+            width: 40px;
+        }
+
+        .table tr td:nth-child(2) {
+            text-align: left;
+        }
+
+        .table tr td:nth-child(3) {
+            text-align: center;
+        }
+
+        #back {
+            margin-top: 50px;
+        }
+
+        #back a {
+            display: inline-block;
+            background-color: #000;
+            color: #fff;
+            font-size: 10px;
+            padding: 18px;
+            font-weight: bold;
+        }
+
+        #back a:hover {
+            background-color: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Cows vs UFO</h1>
+        <div id="scores">
+            <div>
+                <strong>Level One Hight Scores</strong>
+                <table class="table" id="level1">
+                </table>
+            </div>
+            <div>
+                <strong>Level Two Hight Scores</strong>
+                <table class="table" id="level2">
+                </table>
+            </div>
+        </div>
+
+        <div id="back">
+            <a href="index.html">ENTER: GO BACK</a>
+        </div>
+    </div>
+
+    <script src="front.js"></script>
+    <script src="score.js"></script>
+    <script>
+        document.addEventListener('keyup', function(e) {
+            if (e.keyCode === 13) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function updateTable(level) {
+            var score = getTop10(level);
+            var html = '<tr><th></th><th></th><th>Score</th></tr>';
+            for (var i = 0; i < score.length; i++) {
+                html += '<tr>';
+                html += '<td>' + (i + 1) + '.</td>';
+                html += '<td>' + score[i][0] + '</td>';
+                html += '<td>' + score[i][1] + '</td>';
+                html += '</tr>';
+            }
+            document.getElementById('level' + level).innerHTML = html;
+        }
+
+        updateTable(1);
+        updateTable(2);
+    </script>
+</body>
+</html>
