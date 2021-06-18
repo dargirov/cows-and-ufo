@@ -10,13 +10,20 @@ var isFlying = createArray(5,3), isActive=createArray(5,3);
 var coefs =createArray(5,3), coefc=createArray(5,3), myCoefs=0, myCoefc=0;
 var dStar=createArray(5,3);
 var boom=new Image, boomL=240, boomH=140, boomX, boomY;
-var result = 0, lives = 3, level = 2;
+var result = 0, lives = 30, level = 1, invert=1;
+var timer=0;
+
+setInterval(function(){timer++;}, 1000)
 
 back.src="bkg.png";
 ufo.src="ufo.png";
 ray.src="ray.png";
 cought.src="cowwalk1.gif";
 boom.src="boom.png";
+
+if(level === 2){
+	duX=1; duY=1;
+}
 
 for (var i=0; i<5; i++)
 {
@@ -31,9 +38,9 @@ for (var i=0; i<5; i++)
 		coefc[i][j]=0;
 	}
 	
-	star[i][0].src="star2.gif";
-	star[i][1].src="star2.gif";
-	star[i][2].src="star2.gif";
+	star[i][0].src="greenStar.png";
+	star[i][1].src="purpleStar.png";
+	star[i][2].src="blueStar.png";
 	myY[i] = 420;
 	myX[i] = 800;
 	clicked[i]=0;
@@ -82,7 +89,7 @@ function update()
 	scCought+=0.01;
 	if(scCought>1)scCought=1;
 	
-	getOrder();
+	////getOrder();
 	
 	if(brDisappear>100){
 		disappear=0;
@@ -97,14 +104,28 @@ function update()
 	if(pressed===0)raySc+=drSc;
 	else raySc-=drSc/5;
 	
-	// if(ufoX<-20)duX=1;
-	// if(ufoX>800-ufoL+20) duX=-1;
-	// if(ufoY<0)duY=1;
-	// if(ufoY>300)duY=-1;
-	if(ufoX<-20)ufoX=-20;
-    if(ufoX>800-ufoL+20) ufoX=800-ufoL+20;
-	if(ufoY<0)ufoY=0;
-	if(ufoY>300)ufoY=300;
+	if(level === 2){
+		var r=0;
+		if(br%100<5)
+		{
+			r=Math.random();
+			if(ufoX>=-20 && (r<=0.2 || r>=0.7))duX=1;
+			if(r>0.2 && r<0.3)duX=0;
+			if(ufoX<800-ufoL+20 && r>=0.4 && r<0.7) duX=-1;
+			if(ufoY>0 && r<=0.4)duY=1;
+			if(r>0.4 && r<0.6)duY=0;
+			if(ufoY<300 && r>=0.6)duY=-1;
+		}
+		if(ufoX<-20)duX=1;
+		if(ufoX>800-ufoL+20) duX=-1;
+		if(ufoY<0)duY=1;
+		if(ufoY>300)duY=-1;
+	}else{
+		if(ufoX<-20)ufoX=-20;
+		if(ufoX>800-ufoL+20) ufoX=800-ufoL+20;
+		if(ufoY<0)ufoY=0;
+		if(ufoY>300)ufoY=300;
+	}
 	if(ufoY+ufoH/2+19.5*raySc>550)
 		pressed=1;
 	if(raySc<0)
@@ -122,13 +143,16 @@ function update()
 		if(myY[i]<=420 && my[i]!=null && isCought[i]===0){
 			if((br+i)%60<20){
 				if(color[i]===0) my[i].src="cw1.png";
-				else my[i].src="_cw1.png";
+				else if(color[i]===1) my[i].src="_cw1.png";
+				else if(color[i]===2) my[i].src="_cw1_.png";
 			}else if((br+i)%60>=20 && (br+i)%60<40){
 				if(color[i]===0) my[i].src="cw2.png"
-				else my[i].src="_cw2.png";
+				else if(color[i]===1) my[i].src="_cw2.png";
+				else if(color[i]===2) my[i].src="_cw2_.png";
 			}else {
 				if(color[i]===0) my[i].src="cw3.png"
-				else my[i].src="_cw3.png";
+				else if(color[i]===1) my[i].src="_cw3.png";
+				else if(color[i]===2) my[i].src="_cw3_.png";
 			}
 		}
 	}
@@ -144,14 +168,15 @@ function update()
 		}
 		clicked[ind]=1;
 		h=320-Math.random()*220;
-	}else if(level===2 && drSc === 0 && Math.random()<0.07){
-		//drSc = 1;
+	}else if(level===2 && drSc === 0 && Math.random()<0.01 && ufoY<250){
+		drSc = 1;
 	}
 	
 	for (var i=0; i<5; i++){
 		if(clicked[i]===1 && my[i]!=null && isCought[i]===0){
 			if(color[i]===0) my[i].src="cw2.png";	
-			else my[i].src="_cw2.png";	
+			else if(color[i]===1)my[i].src="_cw2.png";	
+			else if(color[i]===2) my[i].src="_cw2_.png";
 			
 			myY[i]=myY[i]-2;
 			if(myY[i]<=h) clicked[i]=2;
@@ -159,7 +184,8 @@ function update()
 		
 		if(clicked[i]===2 && myY[i]<420 && my[i]!=null && isCought[i]===0){
 			if(color[i]===0) my[i].src="cw2.png";
-			else my[i].src="_cw2.png";
+			else if(color[i]===1) my[i].src="_cw2.png";
+			else if(color[i]===2) my[i].src="_cw2_.png";
 			
 			myY[i]=myY[i]+3;
 			if(myY[i]>=420){
@@ -180,9 +206,13 @@ function update()
 				ufoY+ufoH/2+19.5*raySc-myH, 
 				Math.abs(9*raySc-myL),
 				10)){
-			if(color[i]===1)cought.src="cw2.png";
-			else cought.src="_cw2.png";
+			if(color[i]===0)cought.src="cw2.png";
+			else if(color[i]===1) cought.src="_cw2.png";
+			else if(color[i]===2) cought.src="_cw2_.png";
 			isCought[i]=1;
+			if(color[i]===2){
+				invert *=-1;
+			}
 			scCought=0;
 			showCought = true;
 			result += 10;
@@ -201,7 +231,7 @@ function update()
 				ufoL-20,
 				ufoH-20)){
 			isCought[i]=1;
-			disappear=1;
+			disappear=1;			
 			brDisappear=0;
 			boomX=ufoX+ufoL/2-boomL/2;
 			boomY=ufoY+ufoH/2-boomH/2;
@@ -209,11 +239,13 @@ function update()
 		}
 		
 		if(myXc[i]+myL <= 0 ||myXc[i]>=800+myL){
-			if(Math.random()>0.5)color[i]=1;
-			else color[i]=0;
+			var r = Math.random();
+			if(r<0.4)color[i]=0;
+			else if(r<0.7) color[i]=1;
+			else color[i]=2;
 		}
 		
-		if(myXc[i]+myL <= 0 ||myXc[i]>=800){
+		if(myXc[i]+myL <= 0 || myXc[i]>=800){
 			isCought[i]=0;
 		}
 	}
@@ -231,18 +263,20 @@ function draw()
 	context.fillText("result: " + result, 700, 40);
 	context.fillStyle = "red";
 	context.fillText("lives: " + lives, 700, 60);
+	context.fillStyle = "blue";
+	context.fillText("time: " + timer, 700, 80);
 
 	if(lives > 0){
 		for (var i=0; i<5; i++){
 			if(myX + a*1000<-i*200-130) a++;
 			else if (myX + (a-1)*1000>=-i*200-130)a--;	
-			
 			myXc[i] = myX + a*1000+ i*200;
-			// if(myXc[i]>=800 && myXc[i]<860)order[i]=4;
-			// else if(myXc[i]>=600 && myXc[i]<800)order[i]=3;
-			// else if(myXc[i]>=400 && myXc[i]<600)order[i]=2;
-			// else if(myXc[i]>=200 && myXc[i]<400)order[i]=1;
-			// else if(myXc[i]>=0 && myXc[i]<200)order[i]=0;
+			
+			// if(myXc[i]>=800-myL && myXc[i]<800)order[i]=4;
+			// else if(myXc[i]>=600-myL && myXc[i]<800-myL)order[i]=3;
+			// else if(myXc[i]>=400-myL && myXc[i]<600-myL)order[i]=2;
+			// else if(myXc[i]>=200-myL && myXc[i]<400-myL)order[i]=1;
+			// else if(myXc[i]>=0-myL && myXc[i]<200-myL)order[i]=0;
 			myYc[i]=myY[i];
 			
 			var sign;
@@ -262,6 +296,11 @@ function draw()
 						myCoefc=Math.cos(sign*2*p*Math.PI/(mx-0.5));
 						if(isCought[i]===0){
 							context.drawImage(my[i],myXc[i], myYc[i], myL,myH);
+							if(level===2){
+								context.fillStyle = "pink";
+								context.font = "20px arial";
+								context.fillText(i+1, myXc[i]+myL/2, myYc[i]+myH/10);
+							}							
 
 							var stops =[10, Math.round(mx/3)+10, Math.round(2*mx/3)+10]
 							for (var j=0; j<3; j++){
@@ -318,7 +357,12 @@ function draw()
 					}
 				}
 				if (my[i]!=null && isCought[i]===0)	{		
-					context.drawImage(my[i],myXc[i], myYc[i], myL,myH);					
+					context.drawImage(my[i],myXc[i], myYc[i], myL,myH);
+					if(level===2){
+						context.fillStyle = "pink";
+						context.font = "20px arial";
+						context.fillText(i+1, myXc[i]+myL/2, myYc[i]+myH/10);	
+					}					
 				}
 			}
 			//h=0;
@@ -328,7 +372,8 @@ function draw()
 			if(showCought){
 				context.drawImage(
 					cought,
-					ufoX+ufoL/2-9*raySc/2-(1-scCought)*myL/2+raySc*(1-scCought)*myL/24,
+					////ufoX+ufoL/2-9*raySc/2-(1-scCought)*myL/2+raySc*(1-scCought)*myL/24,////
+					ufoX+ufoL/2-(1-scCought)*myL/2,
 					ufoY+ufoH/2+19.5*raySc-100*(1-scCought), 
 					myL*(1-scCought),
 					myH*(1-scCought));
@@ -390,42 +435,41 @@ function keydown(key)
 	console.log("Pressed", key);
 	if(level===1){
 		if(key===37){
-			// if(duX>0)duX*=-1;
-			// duX-=2;
-			// slowdownX=0;
-			duX=-4;
+			duX=-4*invert;
 		}
 		if(key===39){
-			// if(duX<0)duX*=-1;
-			// duX+=2;
-			// slowdownX=0;
-			duX=4;
+			duX=4*invert;
 		}
 		if(key===38){
-			// if(duY>0)duY*=-1;
-			// duY-=2;
-			// slowdownY=0;
-			duY=-4;
+			duY=-4*invert;
 		}
 		if(key===40){
-			// if(duY<0)duY*=-1;
-			// duY+=2;
-			// slowdownY=0;
-			duY=4;
+			duY=4*invert;
 		}
 		if(key===32){duX=0;duY=0;}
-		if(key===13)drSc=1;
+		if(key===13 && ufoY<250)drSc=1;
 	} else if (level===2){
 		if(key>=49&&key<=53)jumpcow(key - 48);
 	}
 }
 
-function jumpcow(key)//още му трябва: сортираме по myXc избираме индекс key от сортирания
+function jumpcow(k)//още му трябва: сортираме по myXc избираме индекс key от сортирания
 {
 	var selected = -1;
 	var anotherFlies = false;
+	
+	// for(var i=0; i<4; i++){
+		// for(var j=i+1; j<5; j++){
+			// if(myXc[i]!=undefined && myXc[i] > myXc[j] && MyXc[j]>0 && order[i]<order[j] ){
+				// var swap = order[i];
+				// order[i]=order[j];
+				// order[j]=swap;
+			// }
+		// }
+	// }
+	
 	for (var i=0; i<5; i++){
-		if(order[i]===key-1){
+		if(order[i]===k-1){
 			selected = i;
 		}
 		if(my[i]!= null && clicked[i]>0){
@@ -434,14 +478,13 @@ function jumpcow(key)//още му трябва: сортираме по myXc и
 		}
 	}
 
-	if(my[selected]!=null && clicked[selected]===0){//!anotherFlies && 
+	if(my[k-1]!=null && clicked[k-1]===0){//!anotherFlies && 
 			if(!anotherFlies){
 				h=320-Math.random()*220;
 			}
 			// if(color[selected]===0){clicked[selected]=1;}////my[i]=null;
 			// else color[selected]=0;
-			clicked[selected]=1;
-			selected =-1;
+			clicked[k-1]=1;
 	}
 }
 
