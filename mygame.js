@@ -466,6 +466,7 @@ function draw()
         if (name !== null) {
             addScore(level, name, result);
         }
+        setTimeout(function() { window.location.href = 'index.html'; }, 1000);
 	}
 	
 	if(level===1){
