@@ -10,7 +10,7 @@ var isFlying = createArray(5,3), isActive=createArray(5,3);
 var coefs =createArray(5,3), coefc=createArray(5,3), myCoefs=0, myCoefc=0;
 var dStar=createArray(5,3);
 var boom=new Image, boomL=240, boomH=140, boomX, boomY;
-var result = 0, lives = 30, level = 1, invert=1;
+var result = 0, lives = 3, level = 1, invert=1;
 var timer=0;
 
 var urlParams = new URLSearchParams(window.location.search);
@@ -28,7 +28,7 @@ cought.src="cowwalk1.gif";
 boom.src="boom.png";
 
 if(level === 2){
-	duX=1; duY=1;
+	duX=1; duY=1; result=100;
 }
 
 for (var i=0; i<5; i++)
@@ -221,7 +221,9 @@ function update()
 			}
 			scCought=0;
 			showCought = true;
-			result += 10;
+			if(level===1)
+				result += 10;
+			else result-=10;
 		}
 		
 		if(my[i]!=null
@@ -242,7 +244,8 @@ function update()
 			brDisappear=0;
 			boomX=ufoX+ufoL/2-boomL/2;
 			boomY=ufoY+ufoH/2-boomH/2;
-			if(lives>0)lives --;
+			if(lives>0 && level===1)lives --;
+			else result+=100;
 		}
 		
 		if(myXc[i]+myL <= 0 ||myXc[i]>=800+myL){
@@ -268,10 +271,13 @@ function draw()
 	context.fillStyle = "white";
 	context.font = "20px arial";
 	context.fillText("result: " + result, 700, 40);
-	context.fillStyle = "red";
-	context.fillText("lives: " + lives, 700, 60);
-	context.fillStyle = "blue";
-	context.fillText("time: " + timer, 700, 80);
+	if(level===1){
+		context.fillStyle = "red";
+		context.fillText("lives: " + lives, 700, 60);
+	}else if (level===2){
+		context.fillStyle = "blue";
+		context.fillText("time: " + timer, 700, 60);
+	}
 
 	if(lives > 0){
 		for (var i=0; i<5; i++){
@@ -391,8 +397,10 @@ function draw()
 		} else if(brDisappear<60)
 			context.drawImage(boom,boomX, boomY, boomL, boomH);
 	}
-	else if (lives === 0){
-		context.drawImage(boom,boomX, boomY, boomL, boomH);
+	else if (lives === 0 || timer===300){
+		if(lives === 0){
+			context.drawImage(boom,boomX, boomY, boomL, boomH);
+		}
 		context.fillStyle = "white";
 		context.font = "100px arial";
 		context.fillText("Game Over!", 150, 300);
