@@ -12,6 +12,8 @@
 var canvas = document.getElementById("canvas-id");
 var context = canvas.getContext("2d");
 
+var gameOver = false;
+
 // global variables with mouse coordinates
 var mouseX = 0;
 var mouseY = 0;
@@ -40,6 +42,10 @@ var reqAnimationFrame =
 	}
 
 function redraw() {
+    if (gameOver) {
+        return;
+    }
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.globalAlpha = 1;
 
@@ -71,7 +77,7 @@ function redraw() {
 
 function callupdate() {
 	update(); // call programmer's update() function
-	setTimeout(callupdate, 10); // and 10 ms after that ...
+    setTimeout(callupdate, 10); // and 10 ms after that ...
 }
 
 function areColliding(Ax, Ay, Awidth, Aheight, Bx, By, Bwidth, Bheight) {
@@ -133,6 +139,7 @@ function init() {
 }
 
 		</script>
+        <script src="score.js"></script>
 		<script src="mygame.js"></script>
 	</body>
 </html>

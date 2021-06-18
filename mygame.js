@@ -263,10 +263,6 @@ function update()
 
 function draw()
 {
-	// This is how you draw a rectangle
-	//context.fillStyle="red";
-	//context.fillRect(0, 0, 800, 600);
-	
 	context.drawImage(back,0,0, 800,600);
 	context.fillStyle = "white";
 	context.font = "20px arial";
@@ -401,10 +397,15 @@ function draw()
 		if(level === 1){
 			context.drawImage(boom,boomX, boomY, boomL, boomH);
 		}
+        gameOver = true;
 		lives=0;
 		context.fillStyle = "white";
 		context.font = "100px arial";
 		context.fillText("Game Over!", 150, 300);
+        var name = prompt('Please enter your name"');
+        if (name !== null) {
+            addScore(level, name, result);
+        }
 	}
 }
 
