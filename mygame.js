@@ -125,11 +125,14 @@ function update()
 		disappear=0;
 	}
 	
-	if(slowdownX>75 && duX!=0)
-		duX=duX/Math.abs(duX);
-	
-	if(slowdownY>75 && duY!=0)
-		duY=duY/Math.abs(duY);
+	if(level===1)
+	{
+		if(slowdownX>75 && duX!=0)
+			duX=duX/Math.abs(duX);
+		
+		if(slowdownY>75 && duY!=0)
+			duY=duY/Math.abs(duY);
+	}
 	
 	if(pressed===0)raySc+=drSc;
 	else raySc-=drSc/5;
@@ -267,7 +270,7 @@ function update()
 		if(my[i]!=null
 			&&myY[i]<400
 			&& isCought[i]===0
-			&& alreadyCollided === 0
+			&& (alreadyCollided === 0 || level===2)
 			&& areColliding (
 				myXc[i]+55-myH*myCoefs/2-2*myL/5, 
 				myYc[i]+myH*myCoefc/2-2*myH/5,
@@ -283,7 +286,7 @@ function update()
 			brDisappear=0;
 			boomX=ufoX+ufoL/2-boomL/2;
 			boomY=ufoY+ufoH/2-boomH/2;
-			alreadyCollided = 1;
+			if(level===1)alreadyCollided = 1;
 			if(lives>0 && level===1)lives --;
 			else result+=100;
 		}
@@ -299,24 +302,27 @@ function update()
 			isCought[i]=0;
 		}
 		
-		var isCowColliding = areColliding (
-				flyingCowX+20, 
-				flyingCowY+20,
-				flyingCowL-20,
-				flyingCowH-40,
-				ufoX,
-				ufoY,
-				ufoL,
-				ufoH);
-		if(isCowColliding && brDisappear>60 && alreadyCollided === 0){
-			disappear=1;
-			brDisappear=0;
-			boomX=ufoX+ufoL/2-boomL/2;
-			boomY=ufoY+ufoH/2-boomH/2;
-			if(lives>0)lives --;
-			alreadyCollided = 1;
-			flyingCowX = 100 + ufoX;
-			flyingCowY =100 + ufoX;
+		if(level===1)
+		{
+			var isCowColliding = areColliding (
+					flyingCowX+20, 
+					flyingCowY+20,
+					flyingCowL-20,
+					flyingCowH-40,
+					ufoX,
+					ufoY,
+					ufoL,
+					ufoH);
+			if(isCowColliding && brDisappear>60 && alreadyCollided === 0){
+				disappear=1;
+				brDisappear=0;
+				boomX=ufoX+ufoL/2-boomL/2;
+				boomY=ufoY+ufoH/2-boomH/2;
+				if(lives>0)lives --;
+				alreadyCollided = 1;
+				flyingCowX = 100 + ufoX;
+				flyingCowY =100 + ufoX;
+			}
 		}
 	}
 }
