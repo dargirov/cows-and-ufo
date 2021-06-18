@@ -509,8 +509,8 @@ function keyup(key)
 			// slowdownY=0;
 			duY=0;
 		}
-		if(key===32){duX=0;duY=0;}
-		if(key===13)drSc=1;
+		if(key===13){duX=0;duY=0;}
+		if(key===32)drSc=1;
 	} else if (level===2){
 		if(key>=49&&key<=53)jumpcow(key - 48);
 	}
