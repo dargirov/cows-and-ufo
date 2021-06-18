@@ -19,7 +19,7 @@ if (levelParam === '2') {
     level = 2;
 }
 
-setInterval(function(){timer++;}, 1000)
+setInterval(function(){if(timer<60)timer++;}, 1000)
 
 back.src="bkg.png";
 ufo.src="ufo.png";
@@ -279,7 +279,7 @@ function draw()
 		context.fillText("time: " + timer, 700, 60);
 	}
 
-	if(lives > 0){
+	if((level===1 && lives > 0) || (level===2 && timer<60)){
 		for (var i=0; i<5; i++){
 			if(myX + a*1000<-i*200-130) a++;
 			else if (myX + (a-1)*1000>=-i*200-130)a--;	
@@ -397,10 +397,11 @@ function draw()
 		} else if(brDisappear<60)
 			context.drawImage(boom,boomX, boomY, boomL, boomH);
 	}
-	else if (lives === 0 || timer===300){
-		if(lives === 0){
+	else if (lives === 0 || (level===2 && timer>=60)){
+		if(level === 1){
 			context.drawImage(boom,boomX, boomY, boomL, boomH);
 		}
+		lives=0;
 		context.fillStyle = "white";
 		context.font = "100px arial";
 		context.fillText("Game Over!", 150, 300);
