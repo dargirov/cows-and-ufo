@@ -337,10 +337,10 @@ function draw()
 	context.font = "20px arial";
 	context.fillText("result: " + result, 700, 40);
 	if(level===1){
-		context.fillStyle = "red";
+		context.fillStyle = "pink";
 		context.fillText("lives: " + lives, 700, 60);
 	}else if (level===2){
-		context.fillStyle = "blue";
+		context.fillStyle = "pink";
 		context.fillText("time: " + timer, 700, 60);
 	}
 
