@@ -13,6 +13,12 @@ var boom=new Image, boomL=240, boomH=140, boomX, boomY;
 var result = 0, lives = 30, level = 1, invert=1;
 var timer=0;
 
+var urlParams = new URLSearchParams(window.location.search);
+var levelParam = urlParams.get('level');
+if (levelParam === '2') {
+    level = 2;
+}
+
 setInterval(function(){timer++;}, 1000)
 
 back.src="bkg.png";
