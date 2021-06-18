@@ -12,6 +12,9 @@ var dStar=createArray(5,3);
 var boom=new Image, boomL=240, boomH=140, boomX, boomY;
 var result = 0, lives = 3, level = 1, invert=1;
 var timer=0;
+var flyingCow = new Image, flyingCowX = 0, flyingCowY = 100, flyingCowL = 80, flyingCowH = 80, testX = 1, testY = 1;
+var alreadyCollided = 0;
+var deathTimer = 0;
 
 var urlParams = new URLSearchParams(window.location.search);
 var levelParam = urlParams.get('level');
@@ -94,8 +97,29 @@ function update()
 	ufoY+=2*duY;
 	scCought+=0.01;
 	if(scCought>1)scCought=1;
+	deathTimer++;
 	
 	////getOrder();
+	
+	
+	
+	// flying cow mechanics
+	flyingCowX+=testX;
+	flyingCowY+=testY;
+	if(flyingCowX<-20)testX=1;
+	if(flyingCowX>800-flyingCowL+20) testX=-1;
+	if(flyingCowY<0){
+		testY=1;
+		if (br%100>55){
+		testY=2;
+		testX=-1;
+		}
+	}
+	if(flyingCowY>300)testY=-1;
+	if(br%1000<2){
+		testY=testY*-1;
+		testX=testX*-2;
+		}
 	
 	if(brDisappear>100){
 		disappear=0;
@@ -162,6 +186,20 @@ function update()
 			}
 		}
 	}
+
+		if((br+i)%60<20){
+			flyingCow.src = "fc1.png";
+		}
+		else if((br+i)%60>=20 && (br+i)%60<40){
+			flyingCow.src = "fc4.png";
+		}
+		else if((br+i)%60>=20 && (br+i)%60<40){
+			flyingCow.src = "fc8.png";
+		}
+		else {
+			flyingCow.src = "fc10.png";
+		}
+		
 	
 	if(level===1 && Math.random()<0.07 && clicked[ind]===0){
 		ind= Math.round(Math.random()*4)
@@ -172,7 +210,7 @@ function update()
 					break;
 				}
 		}
-		clicked[ind]=1;
+		if (alreadyCollided === 0)clicked[ind]=1;
 		h=320-Math.random()*220;
 	}else if(level===2 && drSc === 0 && Math.random()<0.01 && ufoY<250){
 		drSc = 1;
@@ -229,6 +267,7 @@ function update()
 		if(my[i]!=null
 			&&myY[i]<400
 			&& isCought[i]===0
+			&& alreadyCollided === 0
 			&& areColliding (
 				myXc[i]+55-myH*myCoefs/2-2*myL/5, 
 				myYc[i]+myH*myCoefc/2-2*myH/5,
@@ -244,6 +283,7 @@ function update()
 			brDisappear=0;
 			boomX=ufoX+ufoL/2-boomL/2;
 			boomY=ufoY+ufoH/2-boomH/2;
+			alreadyCollided = 1;
 			if(lives>0 && level===1)lives --;
 			else result+=100;
 		}
@@ -257,6 +297,26 @@ function update()
 		
 		if(myXc[i]+myL <= 0 || myXc[i]>=800){
 			isCought[i]=0;
+		}
+		
+		var isCowColliding = areColliding (
+				flyingCowX+20, 
+				flyingCowY+20,
+				flyingCowL-20,
+				flyingCowH-40,
+				ufoX,
+				ufoY,
+				ufoL,
+				ufoH);
+		if(isCowColliding && brDisappear>60 && alreadyCollided === 0){
+			disappear=1;
+			brDisappear=0;
+			boomX=ufoX+ufoL/2-boomL/2;
+			boomY=ufoY+ufoH/2-boomH/2;
+			if(lives>0)lives --;
+			alreadyCollided = 1;
+			flyingCowX = 100 + ufoX;
+			flyingCowY =100 + ufoX;
 		}
 	}
 }
@@ -407,6 +467,16 @@ function draw()
             addScore(level, name, result);
         }
 	}
+	
+	if(level===1){
+		if(disappear===0){
+		context.drawImage(flyingCow,flyingCowX,flyingCowY, flyingCowL,flyingCowH);
+		alreadyCollided = 0;
+		}
+		else if(brDisappear<60){
+			context.drawImage(boom,boomX, boomY, boomL, boomH);
+		}
+	}
 }
 
 
@@ -503,17 +573,6 @@ function jumpcow(k)//още му трябва: сортираме по myXc из
 			// else color[selected]=0;
 			clicked[k-1]=1;
 	}
-}
-
-function mouseup()
-{
-	// Shows coordinates of mouse on click
-	console.log("Mouse clicked at", mouseX, mouseY);
-	for(var i=0;i<5;i++)
-		if(my[i]!=null && areColliding (myXc[i], myYc[i],myL,myH,mouseX, mouseY,0,0)&&myY[i]===420)
-			if(color[i]===0){clicked[i]=1;}////my[i]=null;
-			else color[i]=0;
-			////clicked[i]=1;
 }
 
 function createArray(length) {
