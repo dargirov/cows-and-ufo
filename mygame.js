@@ -1,7 +1,7 @@
 // Creating  variables
 var back=new Image, br=0;
 var my=[], myX = 800, myY=[], myL=130, myH=93, myXc=[], myYc=[];
-var clicked=[], h=0, ind=0, a=0, color=[], isCought=[], order = [];
+var clicked=[], h=0, ind=0, a=0, color=[], isCought=[], order = [], resultAdded = [];
 var ufo=new Image, ufoX=288, ufoY=100, duX=0, duY=0, ufoL=180, ufoH=100, slowdownX=0, slowdownY=0, disappear=0, brDisappear=0;
 var ray=new Image, raySc=0, drSc=0, pressed=0;
 var scCought=0, cought=new Image, showCought=false;
@@ -45,6 +45,7 @@ for (var i=0; i<5; i++)
 		dStar[i][j]=0;
 		coefs[i][j]=0;
 		coefc[i][j]=0;
+		resultAdded[i]=0;
 	}
 	
 	star[i][0].src="greenStar.png";
@@ -288,7 +289,8 @@ function update()
 			boomY=ufoY+ufoH/2-boomH/2;
 			if(level===1)alreadyCollided = 1;
 			if(lives>0 && level===1)lives --;
-			else result+=100;
+			else if (resultAdded[i]===0)result+=100;
+			resultAdded[i]=1;
 		}
 		
 		if(myXc[i]+myL <= 0 ||myXc[i]>=800+myL){
@@ -300,6 +302,7 @@ function update()
 		
 		if(myXc[i]+myL <= 0 || myXc[i]>=800){
 			isCought[i]=0;
+			resultAdded[i]=0;
 		}
 		
 		if(level===1)
