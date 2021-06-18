@@ -231,7 +231,8 @@ function update()
 				ufoL-20,
 				ufoH-20)){
 			isCought[i]=1;
-			disappear=1;			
+			disappear=1;
+			invert=1;
 			brDisappear=0;
 			boomX=ufoX+ufoL/2-boomL/2;
 			boomY=ufoY+ufoH/2-boomH/2;
