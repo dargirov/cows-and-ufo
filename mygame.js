@@ -1,7 +1,7 @@
 // Creating  variables
 var back=new Image, br=0;
 var my=[], myX = 800, myY=[], myL=130, myH=93, myXc=[], myYc=[];
-var clicked=[], h=0, ind=0, a=0, color=[], isCought=[], order = [], resultAdded = [];
+var clicked=[], h=0, ind=0, a=0, color=[], isCought=[];
 var ufo=new Image, ufoX=288, ufoY=100, duX=0, duY=0, ufoL=180, ufoH=100, slowdownX=0, slowdownY=0, disappear=0, brDisappear=0;
 var ray=new Image, raySc=0, drSc=0, pressed=0;
 var scCought=0, cought=new Image, showCought=false;
@@ -14,7 +14,6 @@ var result = 0, lives = 3, level = 1, invert=1;
 var timer=0;
 var flyingCow = new Image, flyingCowX = 0, flyingCowY = 100, flyingCowL = 80, flyingCowH = 80, testX = 1, testY = 1;
 var alreadyCollided = 0;
-var deathTimer = 0;
 
 var urlParams = new URLSearchParams(window.location.search);
 var levelParam = urlParams.get('level');
@@ -38,14 +37,12 @@ for (var i=0; i<5; i++)
 {
 	my[i] = new Image;
 	for(var j=0;j<3;j++){
-		star[i][j] = new Image;
-		
+		star[i][j] = new Image;		
 		isActive[i][j]=0;
 		isFlying[i][j]=0;
 		dStar[i][j]=0;
 		coefs[i][j]=0;
 		coefc[i][j]=0;
-		resultAdded[i]=0;
 	}
 	
 	star[i][0].src="greenStar.png";
@@ -56,36 +53,7 @@ for (var i=0; i<5; i++)
 	clicked[i]=0;
 	color[i]=0;
 	isCought[i]=0;
-	order[i]=i;
 }
-
-function getOrder(){
-	var first = 0;
-	for (var i=0; i<5; i++){
-		if(order[i]===0){
-			first = i;
-			break;
-		}
-	}
-	
-	if(myXc[i]+myL <= 0 || myXc[i]>=800){
-		for (var i=0; i<5; i++){
-			if(i != first) order[i]--;
-		}
-		order[first]=4;
-	}
-	
-	//for(var i=0; i<4; i++){
-	//	for(var j=i+1; j<5; j++){
-	//		if(myXc[i]!=undefined && myXc[i] > myXc[j] && MyXc[j]>0 && order[i]<order[j] ){
-	//			var swap = order[i];
-	//			order[i]=order[j];
-	//			order[j]=swap;
-	//		}
-	//	}
-	//}
-}
-
 
 function update()
 {
@@ -98,12 +66,7 @@ function update()
 	ufoY+=2*duY;
 	scCought+=0.01;
 	if(scCought>1)scCought=1;
-	deathTimer++;
-	
-	////getOrder();
-	
-	
-	
+
 	// flying cow mechanics
 	flyingCowX+=testX;
 	flyingCowY+=testY;
@@ -189,15 +152,24 @@ function update()
 				else if(color[i]===2) my[i].src="_cw3_.png";
 			}
 		}
+		
+		if(myXc[i]+myL <= 0 || myXc[i]>=800){
+			var r = Math.random();
+			if(r<0.4)color[i]=0;
+			else if(r<0.7) color[i]=1;
+			else color[i]=2;
+			
+			isCought[i]=0;
+		}
 	}
 
-		if((br+i)%60<20){
+		if(br%80<20){
 			flyingCow.src = "fc1.png";
 		}
-		else if((br+i)%60>=20 && (br+i)%60<40){
+		else if(br%80>=20 && br%80<40){
 			flyingCow.src = "fc4.png";
 		}
-		else if((br+i)%60>=20 && (br+i)%60<40){
+		else if(br%80>=40 && br%80<60){
 			flyingCow.src = "fc8.png";
 		}
 		else {
@@ -231,11 +203,13 @@ function update()
 		}
 		
 		if(clicked[i]===2 && myY[i]<420 && my[i]!=null && isCought[i]===0){
+			
 			if(color[i]===0) my[i].src="cw2.png";
 			else if(color[i]===1) my[i].src="_cw2.png";
 			else if(color[i]===2) my[i].src="_cw2_.png";
 			
 			myY[i]=myY[i]+3;
+			
 			if(myY[i]>=420){
 				myY[i]=420;
 				clicked[i]=0;
@@ -245,7 +219,9 @@ function update()
 		if(my[i]!=null 
 			&& myY[i]===420
 			&& isCought[i]===0
-			&& areColliding (
+			&& lives>0
+			&& (timer<60 || level === 1)
+			&& areColliding(
 				myXc[i], 
 				myYc[i],
 				Math.abs(9*raySc-myL),
@@ -263,15 +239,16 @@ function update()
 			}
 			scCought=0;
 			showCought = true;
-			if(level===1)
-				result += 10;
+			if(level===1)result += 10;
 			else result-=10;
 		}
 		
 		if(my[i]!=null
-			&&myY[i]<400
-			&& isCought[i]===0
-			&& (alreadyCollided === 0 || level===2)
+			&& myY[i]<400
+			&& isCought[i] === 0
+			&& alreadyCollided === 0
+			&& lives>0
+			&& (timer<60 || level === 1)
 			&& areColliding (
 				myXc[i]+55-myH*myCoefs/2-2*myL/5, 
 				myYc[i]+myH*myCoefc/2-2*myH/5,
@@ -288,21 +265,8 @@ function update()
 			boomX=ufoX+ufoL/2-boomL/2;
 			boomY=ufoY+ufoH/2-boomH/2;
 			if(level===1)alreadyCollided = 1;
-			if(lives>0 && level===1)lives --;
-			else if (resultAdded[i]===0)result+=100;
-			resultAdded[i]=1;
-		}
-		
-		if(myXc[i]+myL <= 0 ||myXc[i]>=800+myL){
-			var r = Math.random();
-			if(r<0.4)color[i]=0;
-			else if(r<0.7) color[i]=1;
-			else color[i]=2;
-		}
-		
-		if(myXc[i]+myL <= 0 || myXc[i]>=800){
-			isCought[i]=0;
-			resultAdded[i]=0;
+			if(lives>0 && level===1)lives--;
+			else result+=100;
 		}
 		
 		if(level===1)
@@ -336,11 +300,10 @@ function draw()
 	context.fillStyle = "white";
 	context.font = "20px arial";
 	context.fillText("result: " + result, 700, 40);
-	if(level===1){
-		context.fillStyle = "pink";
+	context.fillStyle = "pink";
+	if(level===1){		
 		context.fillText("lives: " + lives, 700, 60);
 	}else if (level===2){
-		context.fillStyle = "pink";
 		context.fillText("time: " + timer, 700, 60);
 	}
 
@@ -349,12 +312,6 @@ function draw()
 			if(myX + a*1000<-i*200-130) a++;
 			else if (myX + (a-1)*1000>=-i*200-130)a--;	
 			myXc[i] = myX + a*1000+ i*200;
-			
-			// if(myXc[i]>=800-myL && myXc[i]<800)order[i]=4;
-			// else if(myXc[i]>=600-myL && myXc[i]<800-myL)order[i]=3;
-			// else if(myXc[i]>=400-myL && myXc[i]<600-myL)order[i]=2;
-			// else if(myXc[i]>=200-myL && myXc[i]<400-myL)order[i]=1;
-			// else if(myXc[i]>=0-myL && myXc[i]<200-myL)order[i]=0;
 			myYc[i]=myY[i];
 			
 			var sign;
@@ -409,12 +366,6 @@ function draw()
 							25+ dStar[i][j]*0.1,
 							25+ dStar[i][j]*0.1);
 				}
-				//var midX=myXc[i]+55+40*myCoefc-myH*myCoefs/4;
-				//var midY=myYc[i]+40*myCoefs+myH*myCoefc/4;
-				//context.fillStyle="red";
-				
-				//context.fillRect(midX-10, midY-10, 20, 20);
-				//h=0;
 			}
 			else{
 				for(var j=0;j<3;j++){
@@ -450,7 +401,6 @@ function draw()
 			if(showCought){
 				context.drawImage(
 					cought,
-					////ufoX+ufoL/2-9*raySc/2-(1-scCought)*myL/2+raySc*(1-scCought)*myL/24,////
 					ufoX+ufoL/2-(1-scCought)*myL/2,
 					ufoY+ufoH/2+19.5*raySc-100*(1-scCought), 
 					myL*(1-scCought),
@@ -496,27 +446,15 @@ function keyup(key)
 	console.log("Pressed", key);
 	if(level===1){
 		if(key===37){
-			// if(duX>0)duX*=-1;
-			// duX-=2;
-			// slowdownX=0;
 			duX=0;
 		}
 		if(key===39){
-			// if(duX<0)duX*=-1;
-			// duX+=2;
-			// slowdownX=0;
 			duX=0;
 		}
 		if(key===38){
-			// if(duY>0)duY*=-1;
-			// duY-=2;
-			// slowdownY=0;
 			duY=0;
 		}
 		if(key===40){
-			// if(duY<0)duY*=-1;
-			// duY+=2;
-			// slowdownY=0;
 			duY=0;
 		}
 		if(key===13){duX=0;duY=0;}
@@ -543,44 +481,24 @@ function keydown(key)
 		if(key===40){
 			duY=4*invert;
 		}
-		if(key===32){duX=0;duY=0;}
-		if(key===13 && ufoY<250)drSc=1;
-	} else if (level===2){
-		if(key>=49&&key<=53)jumpcow(key - 48);
 	}
 }
 
-function jumpcow(k)//още му трябва: сортираме по myXc избираме индекс key от сортирания
+function jumpcow(k)
 {
-	var selected = -1;
 	var anotherFlies = false;
 	
-	// for(var i=0; i<4; i++){
-		// for(var j=i+1; j<5; j++){
-			// if(myXc[i]!=undefined && myXc[i] > myXc[j] && MyXc[j]>0 && order[i]<order[j] ){
-				// var swap = order[i];
-				// order[i]=order[j];
-				// order[j]=swap;
-			// }
-		// }
-	// }
-	
 	for (var i=0; i<5; i++){
-		if(order[i]===k-1){
-			selected = i;
-		}
 		if(my[i]!= null && clicked[i]>0){
 			anotherFlies = true;
 			break;
 		}
 	}
 
-	if(my[k-1]!=null && clicked[k-1]===0){//!anotherFlies && 
+	if(my[k-1]!=null && clicked[k-1]===0){
 			if(!anotherFlies){
 				h=320-Math.random()*220;
 			}
-			// if(color[selected]===0){clicked[selected]=1;}////my[i]=null;
-			// else color[selected]=0;
 			clicked[k-1]=1;
 	}
 }
@@ -596,4 +514,3 @@ function createArray(length) {
 
     return arr;
 }
-///level 2 крави срещу уфо. Имаме пастир, който ходи и сръчква кравите да скачат (или ги избираме с цифри), за да убият уфото. Уфото се движи и стреля произволно
