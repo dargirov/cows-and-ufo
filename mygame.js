@@ -13,7 +13,7 @@ var boom=new Image, boomL=240, boomH=140, boomX, boomY;
 var result = 0, lives = 3, level = 1, invert=1;
 var timer=0;
 var flyingCow = new Image, flyingCowX = 0, flyingCowY = 100, flyingCowL = 80, flyingCowH = 80, testX = 1, testY = 1;
-var alreadyCollided = 0;
+var alreadyCollided = 0, deathtimer=500;
 
 var urlParams = new URLSearchParams(window.location.search);
 var levelParam = urlParams.get('level');
@@ -59,6 +59,7 @@ function update()
 {
 	br++;
 	brDisappear++;
+	deathtimer++;
 	myX--;
 	slowdownX++;
 	slowdownY++;
@@ -239,7 +240,13 @@ function update()
 			}
 			scCought=0;
 			showCought = true;
-			if(level===1)result += 10;
+			if(level===1)
+				if(color[i]===0)
+					result += 10;
+				else if (color[i]===1)
+					result += 20;
+				else if (color[i]===2)
+					result += 30;
 			else result-=10;
 		}
 		
@@ -247,7 +254,7 @@ function update()
 			&& myY[i]<400
 			&& isCought[i] === 0
 			&& alreadyCollided === 0
-			&& lives>0
+			&& deathtimer>500
 			&& (timer<60 || level === 1)
 			&& areColliding (
 				myXc[i]+55-myH*myCoefs/2-2*myL/5, 
@@ -267,6 +274,7 @@ function update()
 			if(level===1)alreadyCollided = 1;
 			if(lives>0 && level===1)lives--;
 			else result+=100;
+			deathTimer = 0;
 		}
 		
 		if(level===1)
@@ -280,7 +288,7 @@ function update()
 					ufoY,
 					ufoL,
 					ufoH);
-			if(isCowColliding && brDisappear>60 && alreadyCollided === 0){
+			if(isCowColliding && brDisappear>60 && alreadyCollided === 0 && deathtimer>100){
 				disappear=1;
 				brDisappear=0;
 				boomX=ufoX+ufoL/2-boomL/2;
@@ -289,6 +297,7 @@ function update()
 				alreadyCollided = 1;
 				flyingCowX = 100 + ufoX;
 				flyingCowY =100 + ufoX;
+				deathTimer = 0;
 			}
 		}
 	}
@@ -421,10 +430,12 @@ function draw()
 		context.fillStyle = "white";
 		context.font = "100px arial";
 		context.fillText("Game Over!", 150, 300);
-        var name = prompt('Please enter your name"');
-        if (name !== null) {
-            addScore(level, name, result);
-        }
+		setTimeout(function() { 
+			var name = prompt('Please enter your name"');
+			if (name !== null) {
+				addScore(level, name, result);
+			}
+		}, 500);
         setTimeout(function() { window.location.href = 'index.html'; }, 1000);
 	}
 	
